@@ -97,3 +97,35 @@ A área evoluiu de formulações matemáticas isoladas para o núcleo de decisõ
 * **Cenário:** Necessidade de treinar modelos sem centralizar dados confidenciais dos usuários em um único servidor.
 * **Solução:** O modelo é enviado para treinar localmente nos aparelhos (celulares, sensores IoT) e apenas os pesos matemáticos ajustados retornam para consolidar o modelo global.
 
+---
+
+## 3. Exemplos de Aplicação da Ciência de Dados
+
+Aplicações práticas da disciplina divididas por setor econômico, tipo de dado consumido e soluções adotadas em produção.
+
+
+### Tabela Comparativa de Casos de Uso
+
+| Setor | Tipos de Dados Utilizados | Solução / Algoritmo Aplicado | Objetivo Prático no Mercado |
+| :--- | :--- | :--- | :--- |
+| **Saúde e Medicina** | Prontuários eletrônicos (EHR), exames de imagem, logs hospitalares. | Deep Learning (visão computacional), classificação e séries temporais. | Diagnóstico precoce de patologias, previsão de surtos e alertas automáticos de risco do paciente. |
+| **Serviços Financeiros** | Fluxo de transações em tempo real, geolocalização e cadastros. | Árvores de Decisão, KNN, regressões logísticas. | Prevenção a fraudes em milissegundos e cálculo de risco de crédito (*credit scoring*). |
+| **Marketing e Varejo** | Histórico de compras, clickstream, buscas e redes sociais. | Sistemas de recomendação (filtragem colaborativa), clusterização, regressão. | Personalização de catálogo, precificação dinâmica em tempo real e redução de churn. |
+| **Indústria e Manufatura** | Séries temporais de telemetria IoT (vibração, temperatura, pressão). | Modelos preditivos de regressão e visão computacional na esteira. | Manutenção preditiva (evitar parada de linha) e controle automático de qualidade de peças. |
+| **Agricultura** | Imagens de satélite, dados de sensores de solo e previsão climática. | Modelagem preditiva geoespacial e regressão multivariável. | Otimização de janelas de plantio/colheita, irrigação de precisão e estimativa de safra. |
+| **Setor Público e Governança** | Dados abertos, censo, GPS de transporte e registros fiscais. | Otimização de fluxos, detecção de anomalias financeiras e visualização espacial (ex.: DataViva). | Gestão de tráfego urbano, combate à evasão fiscal e direcionamento de verbas públicas. |
+| **Educação** | Logs de navegação em AVA (tempo de tela, cliques, notas). | Modelagem preditiva e sistemas de recomendação instrucional. | Prevenção de evasão escolar/universitária e trilhas de estudo personalizadas. |
+| **Esportes e Entretenimento** | Telemetria de atletas e métricas de consumo de streaming. | Análise de regressão para scouting de atletas e algoritmos de recomendação de mídia. | Contratação de talentos subvalorizados e decisões sobre investimentos em novas produções. |
+| **Sustentabilidade** | Séries meteorológicas, telemetria naval (AIS) e imagens de satélite. | Processamento em larga escala (Google Earth Engine) e modelos de dispersão. | Monitoramento de emissões de CO2, mapeamento de desmatamento e auditoria de metas ESG. |
+
+
+### Padrões Técnicos Observados no Mercado
+
+#### 1. Ingestão em Tempo Real vs. Processamento em Lote (Batch)
+* **Tempo Real (Streaming):** Obrigatório em detecção de fraude e telemetria de sensores industriais, onde a inferência atrasada invalida o resultado.
+* **Lote (Batch):** Utilizado em cálculos de risco de crédito diário, relatórios de sustentabilidade e re-treinamento periódico de recomendações.
+
+#### 2. Trade-off entre Complexidade e Latência
+* Modelos de *deep learning* entregam precisão alta para exames de imagem e visão computacional na manufatura, mas demandam hardware dedicado (GPUs).
+* Cenários de altíssima frequência (ex.: aprovação de transações de cartão) priorizam modelos mais leves (árvores de decisão, regressões calibradas) que respondem abaixo de 50 milissegundos.
+
