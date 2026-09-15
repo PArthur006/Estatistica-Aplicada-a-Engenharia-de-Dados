@@ -129,3 +129,44 @@ Aplicações práticas da disciplina divididas por setor econômico, tipo de dad
 * Modelos de *deep learning* entregam precisão alta para exames de imagem e visão computacional na manufatura, mas demandam hardware dedicado (GPUs).
 * Cenários de altíssima frequência (ex.: aprovação de transações de cartão) priorizam modelos mais leves (árvores de decisão, regressões calibradas) que respondem abaixo de 50 milissegundos.
 
+---
+
+## 4. Modelagem Dimensional e Arquitetura Medallion em Lakehouses
+
+Organização em camadas que garante a transição incremental de dados brutos e não confiáveis até bases de consumo de alto desempenho analítico.
+
+
+### Camadas Medallion
+
+| Camada | Estado do Dado | Operações Principais | Tecnologias / Formatos | Consumidores Típicos |
+| :--- | :--- | :--- | :--- | :--- |
+| **Bronze** *(Raw)* | Bruto, íntegro, sem tratamento (cópia fiel da origem). | Ingestão contínua ou batch; preservação do histórico de logs, APIs, CDC e Kafka. | Cloud Object Storage (S3, GCS, ADLS) com formatos transacionais ACID (**Delta Lake**, Parquet). | Engenheiros de Dados e pipelines de saneamento. |
+| **Silver** *(Enriched)* | Limpo, padronizado, tipado e deduplicado. | Cast de tipos, remoção de duplicatas, tratamento de nulos, mascaramento LGPD/GDPR. | Delta Lake / Parquet, tabelas semiestruturadas ou desnormalizadas. | Cientistas de Dados (EDA/Features) e analistas técnicos. |
+| **Gold** *(Curated)* | Agregado, modelado para o negócio e de alta performance. | Modelagem Dimensional (Fatos e Dimensões), agregações pré-calculadas e regras de negócio. | Delta Lake, Data Warehouses analíticos e views otimizadas. | Ferramentas de BI (Power BI, Tableau), executivos e modelos de IA em produção. |
+
+
+### Modelagem Dimensional na Camada Gold
+
+Técnica de estruturação focada exclusivamente em otimizar consultas analíticas complexas sem sobrecarregar bancos transacionais (OLTP).
+
+#### Star Schema vs. Snowflake Schema
+* **Star Schema (Padrão de Mercado):**
+  * Dimensões desnormalizadas conectam-se diretamente à tabela Fato central.
+  * *Vantagem corporativa:* **Menor número de JOINs**, resultando em menor latência de consulta e custos reduzidos de computação em relatórios analíticos.
+* **Snowflake Schema:**
+  * Dimensões normalizadas e divididas em sub-dimensões hierárquicas (ex.: `Fato` $\to$ `Cliente` $\to$ `Cidade` $\to$ `Estado`).
+  * *Trade-off:* Economiza armazenamento (irrelevante no custo de nuvem atual), mas penaliza consultas devido aos múltiplos JOINs necessários.
+
+#### Boas Práticas Técnicas
+
+* **Uso de Surrogate Keys (Chaves Artificiais):**
+  * *Regra:* Nunca usar a chave natural de negócio (ex.: CPF, UUID de API, ID do ERP) como chave primária de relacionamento na Fato.
+  * *Implementação:* Gerar chaves numéricas sequenciais/hash no próprio pipeline de carga.
+  * *Motivo de Mercado:* Isola o Data Lakehouse de mutações, migrações ou redefinições no sistema transacional de origem e acelera a indexação matemática em bancos colunares.
+
+* **Metadados de Rastreabilidade (Data Lineage):**
+  * Toda tabela final de Fato e Dimensão deve conter colunas técnicas de auditoria:
+    * `LinData`: Timestamp do momento em que a linha foi inserida/processada pelo pipeline.
+    * `LinOrig`: Identificador do sistema de origem de onde aquele registro foi extraído.
+  * *Motivo de Mercado:* Facilita o rastreamento em incidentes de dados, auditorias externas e reprocessamento pontual de partições corrompidas.
+
